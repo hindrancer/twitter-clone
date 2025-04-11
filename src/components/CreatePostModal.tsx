@@ -1,17 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { FaImage, FaTimes } from "react-icons/fa";
-import { Post } from "../types/post";
-import { updateDoc, doc, getDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { collection, addDoc, doc, getDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase";
 import DefaultAvatar from "./DefaultAvatar";
 import { useAuth } from "../contexts/AuthContext";
 
-
-interface EditPostModalProps {
-  post: Post;
+interface CreatePostModalProps {
   onClose: () => void;
-  onUpdate: (updatedPost: Post) => void;
+  onPostCreated: (post: any) => void;
 }
 
 function GifIcon() {
@@ -22,11 +19,10 @@ function GifIcon() {
   );
 }
 
-export default function EditPostModal({ post, onClose, onUpdate }: EditPostModalProps) {
+export default function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps) {
   const { user } = useAuth();
-  const [content, setContent] = useState(post.content);
+  const [content, setContent] = useState("");
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-  const [existingMediaUrls, setExistingMediaUrls] = useState<string[]>(post.mediaUrls);
   const [isLoading, setLoading] = useState(false);
   const [username, setUsername] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,36 +42,46 @@ export default function EditPostModal({ post, onClose, onUpdate }: EditPostModal
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || isLoading) return;
+    if (!content.trim() || isLoading || !user) return;
 
     try {
       setLoading(true);
-
-      // 새로운 미디어 파일 업로드
-      const newMediaUrls = await Promise.all(
+      
+      // 이미지 업로드
+      const mediaUrls = await Promise.all(
         mediaFiles.map(async (file) => {
-          const storageRef = ref(storage, `posts/${user?.uid}/${Date.now()}-${file.name}`);
+          const storageRef = ref(storage, `posts/${user.uid}/${Date.now()}-${file.name}`);
           const snapshot = await uploadBytes(storageRef, file);
           return getDownloadURL(snapshot.ref);
         })
       );
 
-      // 게시물 업데이트
-      const updatedData = {
+      // 게시물 작성
+      const postData = {
+        authorId: user.uid,
         content,
-        mediaUrls: [...existingMediaUrls, ...newMediaUrls],
+        mediaUrls,
+        createdAt: new Date(),
+        likes: 0,
+        authorDisplayName: user.displayName || "Unknown",
         authorUsername: username || "unknown",
+        authorPhotoURL: user.photoURL,
       };
 
-      await updateDoc(doc(db, "posts", post.id), updatedData);
-
-      onUpdate({
-        ...post,
-        ...updatedData,
+      const docRef = await addDoc(collection(db, "posts"), postData);
+      
+      // 새 게시물을 상위 컴포넌트에 전달
+      onPostCreated({
+        id: docRef.id,
+        ...postData,
       });
+
+      // 폼 초기화
+      setContent("");
+      setMediaFiles([]);
       onClose();
     } catch (error) {
-      console.error("게시물 수정 중 오류가 발생했습니다:", error);
+      console.error("게시물 작성 중 오류가 발생했습니다:", error);
     } finally {
       setLoading(false);
     }
@@ -97,24 +103,11 @@ export default function EditPostModal({ post, onClose, onUpdate }: EditPostModal
       return;
     }
 
-    if (files.length + existingMediaUrls.length + mediaFiles.length > 4) {
+    if (files.length + mediaFiles.length > 4) {
       alert("이미지는 최대 4개까지 첨부할 수 있습니다.");
       return;
     }
     setMediaFiles([...mediaFiles, ...files]);
-  };
-
-  const removeExistingMedia = async (urlToRemove: string) => {
-    try {
-      // Storage에서 파일 삭제
-      const storageRef = ref(storage, urlToRemove);
-      await deleteObject(storageRef);
-      
-      // 상태에서 URL 제거
-      setExistingMediaUrls(existingMediaUrls.filter(url => url !== urlToRemove));
-    } catch (error) {
-      console.error("미디어 파일 삭제 중 오류가 발생했습니다:", error);
-    }
   };
 
   return (
@@ -124,7 +117,7 @@ export default function EditPostModal({ post, onClose, onUpdate }: EditPostModal
           <button onClick={onClose} className="hover:bg-gray-100 p-2 rounded-full">
             <FaTimes />
           </button>
-          <h2 className="font-bold">게시물 수정</h2>
+          <h2 className="font-bold">게시물 작성</h2>
           <div className="w-8"></div>
         </div>
 
@@ -146,25 +139,7 @@ export default function EditPostModal({ post, onClose, onUpdate }: EditPostModal
                 autoFocus
               />
 
-              {/* 기존 미디어 미리보기 */}
-              {existingMediaUrls.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  {existingMediaUrls.map((url, index) => (
-                    <div key={index} className="relative">
-                      <img src={url} alt="Media" className="rounded-lg w-full h-48 object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => removeExistingMedia(url)}
-                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1"
-                      >
-                        <FaTimes />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* 새로운 미디어 미리보기 */}
+              {/* 미디어 미리보기 */}
               {mediaFiles.length > 0 && (
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   {mediaFiles.map((file, index) => (
@@ -229,7 +204,7 @@ export default function EditPostModal({ post, onClose, onUpdate }: EditPostModal
                     disabled={!content.trim() || isLoading}
                     className="bg-[#1d9bf0] text-white px-4 py-2 rounded-full hover:bg-[#1a8cd8] transition-colors disabled:opacity-50"
                   >
-                    {isLoading ? "수정 중..." : "수정하기"}
+                    {isLoading ? "게시 중..." : "게시하기"}
                   </button>
                 </div>
               </div>

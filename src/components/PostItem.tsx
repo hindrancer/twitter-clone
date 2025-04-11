@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaRegComment, FaRetweet, FaRegHeart, FaHeart, FaShareAlt, FaEllipsisH } from "react-icons/fa";
 import { Post } from "../types/post";
@@ -24,6 +24,19 @@ export default function PostItem({ post, onPostUpdate, onPostDelete }: PostItemP
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // 모달이 열렸을 때 스크롤 방지
+  useEffect(() => {
+    if (showEditModal || showDeleteModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showEditModal, showDeleteModal]);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -121,13 +134,9 @@ export default function PostItem({ post, onPostUpdate, onPostDelete }: PostItemP
             </div>
 
             <p className="mt-2 text-gray-900">{post.content}</p>
-
+            
             {post.mediaUrls.length > 0 && (
-              <div className={`grid gap-2 mt-2 ${
-                post.mediaUrls.length === 1 ? 'grid-cols-1' : 
-                post.mediaUrls.length === 2 ? 'grid-cols-2' :
-                'grid-cols-2'
-              }`}>
+              <div className="grid grid-cols-2 gap-2 mt-2">
                 {post.mediaUrls.map((url, index) => (
                   <img
                     key={index}
@@ -186,4 +195,4 @@ export default function PostItem({ post, onPostUpdate, onPostDelete }: PostItemP
       )}
     </>
   );
-} 
+}

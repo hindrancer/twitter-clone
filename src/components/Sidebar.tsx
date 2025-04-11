@@ -15,7 +15,13 @@ import {
 } from "react-icons/fa";
 import DefaultAvatar from "./DefaultAvatar";
 
-export default function Sidebar() {
+// Sidebar Props 인터페이스 정의
+interface SidebarProps {
+  showCreatePostModal: boolean;
+  setShowCreatePostModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function Sidebar({ showCreatePostModal, setShowCreatePostModal }: SidebarProps) {
   const { user } = useAuth();
   const location = useLocation();
   const [showLogoutMenu, setShowLogoutMenu] = useState(false);
@@ -38,7 +44,7 @@ export default function Sidebar() {
     { icon: FaHashtag, label: "탐색하기", path: "/explore" },
     { icon: FaBell, label: "알림", path: "/notifications" },
     { icon: FaBookmark, label: "북마크", path: "/bookmarks" },
-    { icon: FaUser, label: "프로필", path: `/profile/${user?.displayName}` },
+    { icon: FaUser, label: "프로필", path: `/profile/${username}` },
   ];
 
   const handleLogout = async () => {
@@ -74,7 +80,10 @@ export default function Sidebar() {
           ))}
 
           {/* 게시하기 버튼 */}
-          <button className="w-full bg-[#1d9bf0] text-white rounded-full py-3 mt-4 hover:bg-[#1a8cd8] transition-colors">
+          <button 
+            className="w-full bg-[#1d9bf0] text-white rounded-full py-3 mt-4 hover:bg-[#1a8cd8] transition-colors"
+            onClick={() => setShowCreatePostModal(true)}
+          >
             게시하기
           </button>
         </nav>
