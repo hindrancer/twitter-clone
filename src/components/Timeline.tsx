@@ -3,6 +3,7 @@ import { collection, query, orderBy, limit, getDocs, startAfter, onSnapshot } fr
 import { db } from "../firebase";
 import { Post } from "../types/post";
 import PostItem from "./PostItem";
+import DefaultAvatar from "./DefaultAvatar";
 
 interface TimelineProps {
   posts: Post[];
@@ -85,14 +86,40 @@ export default function Timeline({ posts, setPosts }: TimelineProps) {
   }
 
   return (
-    <div>
-      {posts.map(post => (
-        <PostItem
-          key={post.id}
-          post={post}
-          onPostUpdate={handlePostUpdate}
-          onPostDelete={handlePostDelete}
-        />
+    <div className="divide-y divide-gray-200">
+      {posts.map((post) => (
+        <div key={post.id} className="p-4">
+          <div className="flex items-start gap-4">
+            {post.authorPhotoURL ? (
+              <img
+                src={post.authorPhotoURL}
+                alt="Profile"
+                className="w-12 h-12 rounded-full"
+              />
+            ) : (
+              <DefaultAvatar />
+            )}
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-bold">{post.authorDisplayName}</span>
+                <span className="text-gray-500">@{post.authorUsername}</span>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap">{post.content}</p>
+              {post.mediaUrls.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {post.mediaUrls.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt="Media"
+                      className="rounded-lg w-full h-48 object-cover"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       ))}
       {lastVisible && (
         <div className="p-4 text-center">

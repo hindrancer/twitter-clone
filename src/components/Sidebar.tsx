@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
+import { doc, getDoc } from "firebase/firestore";
 import { 
   FaHome, 
   FaHashtag, 
@@ -18,6 +19,19 @@ export default function Sidebar() {
   const { user } = useAuth();
   const location = useLocation();
   const [showLogoutMenu, setShowLogoutMenu] = useState(false);
+  const [username, setUsername] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setUsername(userDoc.data().username);
+        }
+      }
+    };
+    fetchUsername();
+  }, [user]);
 
   const menuItems = [
     { icon: FaHome, label: "홈", path: "/" },
@@ -82,7 +96,7 @@ export default function Sidebar() {
             )}
             <div className="flex-1 text-left">
               <p className="font-bold">{user?.displayName}</p>
-              <p className="text-gray-500">@{user?.displayName}</p>
+              <p className="text-gray-500">@{username}</p>
             </div>
             <FaEllipsisH />
           </button>

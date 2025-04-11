@@ -37,7 +37,7 @@ export default function Signup() {
       setLoading(true);
       // 1. 이메일/비밀번호로 계정 생성
       const credentials = await createUserWithEmailAndPassword(auth, email, password);
-      // 2. 사용자 프로필 업데이트 (이름 추가)
+      // 2. 사용자 프로필 업데이트 (이름만 저장)
       await updateProfile(credentials.user, {
         displayName: name
       });

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 interface UsernameModalProps {
   onComplete: () => void;
@@ -33,9 +35,13 @@ export default function UsernameModal({ onComplete }: UsernameModalProps) {
         return;
       }
 
-      // 사용자 프로필 업데이트 (username만 저장)
-      await updateProfile(user, {
-        displayName: username // @ 없이 저장
+      // Firestore에 사용자 정보 저장
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, {
+        username: username,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        createdAt: new Date(),
       });
 
       onComplete();

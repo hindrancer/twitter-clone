@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { FaImage } from "react-icons/fa";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase";
 import DefaultAvatar from "./DefaultAvatar";
@@ -24,8 +24,21 @@ export default function PostForm({ onPostCreated }: PostFormProps) {
   const [content, setContent] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [username, setUsername] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const gifInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setUsername(userDoc.data().username);
+        }
+      }
+    };
+    fetchUsername();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +64,7 @@ export default function PostForm({ onPostCreated }: PostFormProps) {
         createdAt: new Date(),
         likes: 0,
         authorDisplayName: user.displayName || "Unknown",
-        authorUsername: user.displayName || "unknown",
+        authorUsername: username || "unknown",
         authorPhotoURL: user.photoURL,
       };
 
@@ -66,7 +79,7 @@ export default function PostForm({ onPostCreated }: PostFormProps) {
         createdAt: new Date(),
         likes: 0,
         authorDisplayName: user.displayName || "Unknown",
-        authorUsername: user.displayName || "unknown", 
+        authorUsername: username || "unknown",
         authorPhotoURL: user.photoURL || "",
       });
 
