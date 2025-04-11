@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaImage, FaTimes } from "react-icons/fa";
 import { Post } from "../types/post";
-import { updateDoc, doc } from "firebase/firestore";
+import { updateDoc, doc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "../firebase";
 import DefaultAvatar from "./DefaultAvatar";
@@ -28,8 +28,21 @@ export default function EditPostModal({ post, onClose, onUpdate }: EditPostModal
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [existingMediaUrls, setExistingMediaUrls] = useState<string[]>(post.mediaUrls);
   const [isLoading, setLoading] = useState(false);
+  const [username, setUsername] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const gifInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setUsername(userDoc.data().username);
+        }
+      }
+    };
+    fetchUsername();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +64,7 @@ export default function EditPostModal({ post, onClose, onUpdate }: EditPostModal
       const updatedData = {
         content,
         mediaUrls: [...existingMediaUrls, ...newMediaUrls],
+        authorUsername: username || "unknown",
       };
 
       await updateDoc(doc(db, "posts", post.id), updatedData);
