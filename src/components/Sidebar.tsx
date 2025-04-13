@@ -6,7 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { 
   FaHome, 
-  FaHashtag, 
+  FaSearch, 
   FaBell, 
   FaBookmark, 
   FaUser, 
@@ -41,10 +41,10 @@ export default function Sidebar({ showCreatePostModal, setShowCreatePostModal }:
 
   const menuItems = [
     { icon: FaHome, label: "홈", path: "/" },
-    { icon: FaHashtag, label: "탐색하기", path: "/explore" },
+    { icon: FaSearch, label: "탐색하기", path: "/explore" },
     { icon: FaBell, label: "알림", path: "/notifications" },
     { icon: FaBookmark, label: "북마크", path: "/bookmarks" },
-    { icon: FaUser, label: "프로필", path: `/profile/${username}` },
+    { icon: FaUser, label: "프로필", path: "/profile" },
   ];
 
   const handleLogout = async () => {

@@ -6,11 +6,13 @@ import LoadingScreen from "../components/LoadingScreen";
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
+  setUser: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -19,8 +21,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Firebase 인증 상태 변경 감지
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      // 여기서 firebaseUser 객체는 최신 상태를 반영할 수 있지만,
+      // photoURL 등의 세부 정보 변경은 즉시 반영되지 않을 수 있음
+      setUser(firebaseUser);
       setIsLoading(false);
     });
 
@@ -34,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading }}>
+    <AuthContext.Provider value={{ user, isLoading, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -13,7 +13,7 @@ interface CreatePostModalProps {
 
 function GifIcon() {
   return (
-    <div className="w-6 h-6 flex items-center justify-center font-bold text-[#1d9bf0] border-2 border-current rounded text-xs">
+    <div className="w-5 h-5 flex items-center justify-center font-bold text-[#1d9bf0] border-2 border-current rounded text-xs">
       GIF
     </div>
   );
@@ -162,7 +162,7 @@ export default function CreatePostModal({ onClose, onPostCreated }: CreatePostMo
               )}
 
               <div className="flex items-center justify-between mt-4">
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -173,7 +173,7 @@ export default function CreatePostModal({ onClose, onPostCreated }: CreatePostMo
                   <button
                     type="button"
                     onClick={() => gifInputRef.current?.click()}
-                    className="hover:bg-blue-50 p-2 rounded-full transition-colors"
+                    className="text-[#1d9bf0] hover:bg-blue-50 p-2 rounded-full transition-colors flex items-center justify-center"
                   >
                     <GifIcon />
                   </button>
