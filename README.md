@@ -1,54 +1,79 @@
-# React + TypeScript + Vite
+# Twitter 클론 프로젝트
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Firebase와 React를 사용하여 Twitter의 핵심 기능을 클론하는 프로젝트입니다.
 
-Currently, two official plugins are available:
+## 기술 스택
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+*   **프론트엔드:** React, TypeScript, Vite
+*   **스타일링:** Tailwind CSS
+*   **백엔드 및 데이터베이스:** Firebase (Authentication, Firestore, Storage)
+*   **라우팅:** React Router DOM
+*   **상태 관리:** React Context API
+*   **기타 라이브러리:**
+    *   `react-icons`: 아이콘 사용
+    *   `date-fns`: 날짜 포매팅
+    *   `react-easy-crop`: 프로필 이미지 크롭
 
-## Expanding the ESLint configuration
+## 주요 기능
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*   Firebase 이메일/비밀번호 인증 (회원가입, 로그인, 로그아웃)
+*   게시물 작성 (텍스트, 이미지/GIF 첨부)
+*   타임라인 (최신 게시물 표시, 무한 스크롤)
+*   프로필 페이지
+    *   사용자 정보 표시
+    *   사용자가 작성한 게시물 표시
+    *   프로필 사진 업로드 및 수정 (이미지 크롭 기능 포함)
+*   기본 아바타 표시
+*   보호된 라우트 (로그인 필요)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 설정 및 실행
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1.  **Firebase 프로젝트 설정:**
+    *   Firebase 콘솔에서 새 프로젝트를 생성합니다.
+    *   웹 앱을 추가하고 Firebase 구성 정보(apiKey, authDomain 등)를 얻습니다.
+    *   Authentication을 활성화하고 '이메일/비밀번호' 로그인 제공업체를 사용 설정합니다.
+    *   Firestore Database를 생성합니다. (테스트 모드 또는 프로덕션 모드 보안 규칙 설정 필요)
+    *   Storage를 활성화합니다. (Storage 보안 규칙 설정 필요)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+2.  **프로젝트 설정:**
+    *   저장소를 클론합니다:
+        ```bash
+        git clone <repository-url>
+        cd twitter-clone
+        ```
+    *   필요한 패키지를 설치합니다:
+        ```bash
+        npm install
+        # 또는
+        yarn install
+        ```
+    *   프로젝트 루트에 `.env` 파일을 생성하고 Firebase 구성 정보를 추가합니다:
+        ```dotenv
+        VITE_API_KEY=your_api_key
+        VITE_AUTH_DOMAIN=your_auth_domain
+        VITE_PROJECT_ID=your_project_id
+        VITE_STORAGE_BUCKET=your_storage_bucket
+        VITE_MESSAGING_SENDER_ID=your_messaging_sender_id
+        VITE_APP_ID=your_app_id
+        ```
+        (실제 환경 변수 이름은 `src/firebase.ts` 파일의 `firebaseConfig`를 참조하여 일치시켜야 합니다.)
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+3.  **개발 서버 실행:**
+    ```bash
+    npm run dev
+    # 또는
+    yarn dev
+    ```
+    이제 브라우저에서 앱을 확인할 수 있습니다 (기본적으로 `http://localhost:5173`).
+
+## 향후 개선 사항
+
+*   게시물 좋아요, 리트윗, 댓글 기능
+*   사용자 팔로우/언팔로우 기능
+*   알림 기능
+*   Firestore 보안 규칙 강화
+*   Storage 보안 규칙 강화
+*   탐색 페이지 기능 구현
+*   북마크 기능 구현
+*   테스트 코드 작성
+*   컴포넌트 및 로직 최적화
