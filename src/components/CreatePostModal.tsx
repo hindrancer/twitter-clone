@@ -135,7 +135,7 @@ export default function CreatePostModal({ onClose, onPostCreated }: CreatePostMo
                 onChange={(e) => setContent(e.target.value)}
                 className="w-full min-h-[100px] resize-none border-none focus:ring-0 text-xl"
                 placeholder="무슨 일이 일어나고 있나요?"
-                maxLength={140}
+                maxLength={4000}
                 autoFocus
               />
 
@@ -197,7 +197,7 @@ export default function CreatePostModal({ onClose, onPostCreated }: CreatePostMo
                 
                 <div className="flex items-center gap-4">
                   <span className="text-gray-500">
-                    {content.length}/140
+                    {content.length}/4000
                   </span>
                   <button
                     type="submit"
