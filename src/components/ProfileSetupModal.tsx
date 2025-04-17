@@ -5,7 +5,6 @@ import { storage, db } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
-import DefaultAvatar from './DefaultAvatar'; // 기본 아바타 사용
 
 // react-easy-crop import
 import Cropper, { Point, Area } from 'react-easy-crop';

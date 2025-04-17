@@ -9,8 +9,7 @@ import {
   FaSearch, 
   FaBell, 
   FaBookmark, 
-  FaUser, 
-  FaTwitter,
+  FaUser,
   FaEllipsisH
 } from "react-icons/fa";
 import DefaultAvatar from "./DefaultAvatar";
@@ -21,7 +20,7 @@ interface SidebarProps {
   setShowCreatePostModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function Sidebar({ showCreatePostModal, setShowCreatePostModal }: SidebarProps) {
+export default function Sidebar({ setShowCreatePostModal }: SidebarProps) {
   const { user } = useAuth();
   const location = useLocation();
   const [showLogoutMenu, setShowLogoutMenu] = useState(false);

@@ -13,7 +13,7 @@ import ProfileSetupModal from "../components/ProfileSetupModal"; // 모달 컴�
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user: currentUser, setUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const [profileUser, setProfileUser] = useState<UserProfile | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
